@@ -1,0 +1,7 @@
+{
+  "name": "Glass Box: AI Planning Assistant",
+  "description": "An evidentiary AI-powered platform for Senior Planners to assess State Significant Development applications with full transparency, accountability, and contestability in line with the NSW AI Assurance Framework.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
