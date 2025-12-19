@@ -66,3 +66,16 @@ export interface VendorHealth {
   driftIndex: number;
   complianceScore: number;
 }
+
+export interface SystemRisk {
+  id: string;
+  title: string;
+  severity: 'high' | 'medium' | 'low';
+  trend: 'up' | 'down' | 'stable';
+}
+
+export interface GenealogyStep {
+  label: string;
+  status: 'complete' | 'active' | 'pending';
+  timestamp: string;
+}

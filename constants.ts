@@ -1,5 +1,5 @@
 
-import { DocumentStatus, ComplianceIssue, Precedent, AuditLog, AIAFMetric, VendorHealth } from './types';
+import { DocumentStatus, ComplianceIssue, Precedent, AuditLog, AIAFMetric, VendorHealth, SystemRisk, GenealogyStep } from './types';
 
 export const PROJECT_NAME = "Western Sydney Green Tech Hub";
 export const PROJECT_ID = "SSD-2024-0892";
@@ -117,9 +117,30 @@ export const MOCK_AIAF_METRICS: AIAFMetric[] = [
 ];
 
 export const MOCK_VENDOR_HEALTH: VendorHealth = {
-  modelName: 'Buy.NSW SR00809 (Production)',
+  modelName: 'Buy.NSW SR00809 (SSD-GPT-4v)',
   latency: '1.2s',
   lastTrained: '2024-11-01',
   driftIndex: 0.12,
   complianceScore: 94.5
 };
+
+export const ACTIVE_RISKS: SystemRisk[] = [
+  { id: 'R-04', title: 'Model Drift in Heritage Detection', severity: 'high', trend: 'up' },
+  { id: 'R-09', title: 'Regional Bias: Flood Zone C', severity: 'medium', trend: 'up' },
+  { id: 'R-12', title: 'PII Leakage risk in CAD parsing', severity: 'low', trend: 'stable' }
+];
+
+export const GENEALOGY: GenealogyStep[] = [
+  { label: 'Document Ingest', status: 'complete', timestamp: '09:00:05' },
+  { label: 'OCR Extraction', status: 'complete', timestamp: '09:00:12' },
+  { label: 'Rule Mapping', status: 'active', timestamp: '09:00:45' },
+  { label: 'Final Recommendation', status: 'pending', timestamp: '-' }
+];
+
+export const REGION_BIAS_DATA = [
+  { name: 'Sydney Metro', approval: 85, variance: 0 },
+  { name: 'Western Sydney', approval: 82, variance: -3 },
+  { name: 'Central Coast', approval: 78, variance: -7 },
+  { name: 'Hunter Region', approval: 89, variance: 4 },
+  { name: 'Flood Zone C', approval: 68, variance: -17 }
+];

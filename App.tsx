@@ -37,52 +37,56 @@ const App: React.FC = () => {
     }
   };
 
+  const isAssurance = activePhase === Phase.ASSURANCE;
+
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className={`flex h-screen overflow-hidden ${isAssurance ? 'bg-[#0a0e14]' : 'bg-slate-50'}`}>
       <Sidebar activePhase={activePhase} setActivePhase={setActivePhase} />
       
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
-          <div className="flex items-center gap-4">
-            <h1 className="text-lg font-bold text-slate-800">{PROJECT_NAME}</h1>
-            <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-xs font-mono uppercase">
-              {PROJECT_ID}
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setActivePhase(Phase.ASSURANCE)}
-              className={`relative p-2 transition-colors ${activePhase === Phase.ASSURANCE ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
-              title="System Governance"
-            >
-              <i className="fa-solid fa-shield-halved text-xl"></i>
-              <span className="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full border-2 border-white"></span>
-            </button>
-            <button 
-              onClick={() => setActivePhase(Phase.BULLETIN)}
-              className={`relative p-2 transition-colors ${activePhase === Phase.BULLETIN ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
-              title="Innovation Hub"
-            >
-              <i className="fa-solid fa-bell text-xl"></i>
-            </button>
-            <div className="h-8 w-px bg-slate-200 mx-2"></div>
+        {/* Header - Hidden in Assurance mode to maximize dashboard space */}
+        {!isAssurance && (
+          <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-slate-700">{USER_NAME}</p>
-                <p className="text-xs text-slate-400">Owner's Engineer | System Assurance</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
-                SP
+              <h1 className="text-lg font-bold text-slate-800">{PROJECT_NAME}</h1>
+              <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-xs font-mono uppercase">
+                {PROJECT_ID}
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setActivePhase(Phase.ASSURANCE)}
+                className={`relative p-2 transition-colors ${activePhase === Phase.ASSURANCE ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
+                title="System Governance"
+              >
+                <i className="fa-solid fa-shield-halved text-xl"></i>
+                <span className="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full border-2 border-white"></span>
+              </button>
+              <button 
+                onClick={() => setActivePhase(Phase.BULLETIN)}
+                className={`relative p-2 transition-colors ${activePhase === Phase.BULLETIN ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
+                title="Innovation Hub"
+              >
+                <i className="fa-solid fa-bell text-xl"></i>
+              </button>
+              <div className="h-8 w-px bg-slate-200 mx-2"></div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-slate-700">{USER_NAME}</p>
+                  <p className="text-xs text-slate-400">Owner's Engineer | System Assurance</p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
+                  SP
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {/* Content Area */}
         <div className="flex-1 flex overflow-hidden">
-          <div className={`flex-1 overflow-y-auto p-8 transition-all duration-300 ${selectedIssue ? 'w-1/2' : 'w-full'}`}>
-            <div className="max-w-6xl mx-auto">
+          <div className={`flex-1 overflow-y-auto ${isAssurance ? 'p-0' : 'p-8'} transition-all duration-300 ${selectedIssue ? 'w-1/2' : 'w-full'}`}>
+            <div className={`${isAssurance ? 'max-w-none h-full' : 'max-w-6xl mx-auto'}`}>
               {renderPhase()}
             </div>
           </div>
