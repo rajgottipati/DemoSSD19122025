@@ -1,164 +1,173 @@
 
 import React from 'react';
-import { MOCK_AIAF_METRICS, MOCK_VENDOR_HEALTH, ACTIVE_RISKS, GENEALOGY, REGION_BIAS_DATA } from '../constants';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar, CartesianGrid } from 'recharts';
+import { MOCK_AIAF_METRICS, MOCK_VENDOR_HEALTH, ACTIVE_RISKS, GENEALOGY, REGION_BIAS_DATA, MOCK_BLOCKED_ATTEMPTS } from '../constants';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, ComposedChart, CartesianGrid } from 'recharts';
 
-const telemetryData = [
-  { time: '09:00', latency: 1.1, trust: 92, drift: 0.02 },
-  { time: '10:00', latency: 1.4, trust: 88, drift: 0.05 },
-  { time: '11:00', latency: 2.1, trust: 75, drift: 0.12 },
-  { time: '12:00', latency: 1.2, trust: 82, drift: 0.15 },
-  { time: '13:00', latency: 1.3, trust: 80, drift: 0.14 },
-  { time: '14:00', latency: 1.5, trust: 78, drift: 0.18 },
+const confidenceTrend = [
+  { time: 'Mon', confidence: 98, drift: 0.01 },
+  { time: 'Tue', confidence: 97, drift: 0.02 },
+  { time: 'Wed', confidence: 95, drift: 0.05 },
+  { time: 'Thu', confidence: 92, drift: 0.08 },
+  { time: 'Fri', confidence: 88, drift: 0.12 },
+  { time: 'Sat', confidence: 85, drift: 0.15 },
+  { time: 'Sun', confidence: 82, drift: 0.18 },
 ];
 
 const featureImportance = [
-  { feature: 'Height (m)', importance: 88, errorRate: 12 },
-  { feature: 'GFA (sqm)', importance: 94, errorRate: 25 },
-  { feature: 'Flood Zone', importance: 72, errorRate: 35 },
-  { feature: 'Heritage Buffer', importance: 65, errorRate: 8 },
+  { feature: 'Height (m)', importance: 88, errorRate: 12, clause: 'SEPP 2.7' },
+  { feature: 'GFA (sqm)', importance: 94, errorRate: 25, clause: 'LEP 2012 Cl 4.3' },
+  { feature: 'Flood Zone', importance: 72, errorRate: 35, clause: 'DCP Sec 5' },
+  { feature: 'Heritage Buffer', importance: 65, errorRate: 8, clause: 'Heritage Act 1977' },
 ];
 
 const PhaseAssurance: React.FC = () => {
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Assurance Report: ${MOCK_VENDOR_HEALTH.modelName}`);
+    const body = encodeURIComponent(`System Health: ${MOCK_VENDOR_HEALTH.complianceScore}%\nActive Risks: ${ACTIVE_RISKS.length}\nDrift Index: ${MOCK_VENDOR_HEALTH.driftIndex}`);
+    window.location.href = `mailto:vendor-support@nsw.gov.au?subject=${subject}&body=${body}`;
+  };
+
   return (
-    <div className="min-h-full bg-[#030712] text-slate-400 p-8 font-sans selection:bg-blue-500/30">
-      {/* Global System Telemetry Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+    <div className="min-h-full bg-[#030712] text-slate-400 p-8 font-sans selection:bg-blue-500/30 print:bg-white print:text-black">
+      {/* Control Center Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 border-b border-slate-800 pb-6 print:border-slate-200">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <div className="flex -space-x-1">
+            <div className="flex -space-x-1 print:hidden">
               <div className="w-2 h-6 bg-blue-600 rounded-sm"></div>
               <div className="w-2 h-6 bg-blue-400 rounded-sm"></div>
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic">Control Center <span className="text-blue-500 font-light not-italic">AIAF Monitor</span></h1>
+            <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic print:text-black print:not-italic">
+              NSW AIAF <span className="text-blue-500 font-light not-italic">Assurance Monitor</span>
+            </h1>
           </div>
-          <p className="text-[10px] font-mono text-slate-500 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-            OWNER'S ENGINEER INTERFACE v4.9-STABLE // SYSTEM: SR00809-PROD
+          <p className="text-[10px] font-mono text-slate-500 flex items-center gap-2 print:text-slate-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse print:hidden"></span>
+            SYSTEM: SR00809-PROD // VERSION 4.9.2-STABLE
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {MOCK_AIAF_METRICS.map((metric, i) => (
-            <div key={i} className="bg-slate-900/40 border border-slate-800 px-4 py-2 rounded-lg flex flex-col min-w-[120px]">
-              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{metric.category}</span>
-              <div className="flex items-center justify-between mt-1">
-                <span className={`text-lg font-mono font-bold ${metric.status === 'drift' ? 'text-amber-500' : 'text-white'}`}>{metric.score}%</span>
-                <i className={`fa-solid ${metric.status === 'drift' ? 'fa-arrow-trend-down text-amber-500' : 'fa-check text-green-500'} text-[10px]`}></i>
-              </div>
-            </div>
-          ))}
+        <div className="flex items-center gap-4 print:hidden">
+          <button 
+            onClick={handleEmail}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-[11px] font-bold text-slate-300 hover:bg-slate-800 transition-all"
+          >
+            <i className="fa-solid fa-envelope"></i> EMAIL REPORT
+          </button>
+          <button 
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-lg text-[11px] font-bold text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20"
+          >
+            <i className="fa-solid fa-print"></i> PRINT STATUS
+          </button>
         </div>
       </div>
 
+      {/* KPI Ribbon */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+        {MOCK_AIAF_METRICS.map((metric, i) => (
+          <div key={i} className="bg-slate-900/40 border border-slate-800 px-4 py-3 rounded-xl print:border-slate-200">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest print:text-slate-600">{metric.category}</span>
+            <div className="flex items-center justify-between mt-1">
+              <span className={`text-xl font-mono font-bold ${metric.status === 'drift' ? 'text-amber-500' : 'text-white print:text-black'}`}>{metric.score}%</span>
+              <i className={`fa-solid ${metric.status === 'drift' ? 'fa-triangle-exclamation text-amber-500' : 'fa-check-circle text-green-500'} text-xs`}></i>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="grid grid-cols-12 gap-6">
-        
-        {/* Panel 1: Real-Time Observability & Human Trust Index */}
+        {/* Main Observability Column */}
         <div className="col-span-12 lg:col-span-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 bg-slate-900/20 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <i className="fa-solid fa-wave-square text-6xl text-blue-500"></i>
-              </div>
+            {/* Reliability / Drift Chart */}
+            <div className="md:col-span-2 bg-slate-900/20 border border-slate-800 rounded-2xl p-6 relative overflow-hidden print:border-slate-200">
               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center justify-between">
-                System Telemetry: Latency vs. Human Trust
-                <span className="text-[9px] font-mono text-slate-600">SAMPLE RATE: 100ms</span>
+                Reliability: Model Drift Analytics
+                <span className="text-[9px] font-mono text-slate-600 print:text-slate-400">7-DAY WINDOW</span>
               </h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={telemetryData}>
+                  <AreaChart data={confidenceTrend}>
                     <defs>
-                      <linearGradient id="trustGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      <linearGradient id="confGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f87171" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#f87171" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-                    <XAxis dataKey="time" hide />
-                    <YAxis hide />
+                    <XAxis dataKey="time" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
+                    <YAxis domain={[70, 100]} hide />
                     <Tooltip 
                       contentStyle={{backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', fontSize: '10px'}}
-                      itemStyle={{padding: '2px 0'}}
                     />
-                    <Area type="monotone" dataKey="trust" stroke="#3b82f6" strokeWidth={3} fill="url(#trustGradient)" />
-                    <Line type="monotone" dataKey="latency" stroke="#f59e0b" strokeWidth={2} dot={{fill: '#f59e0b', r: 3}} strokeDasharray="5 5" />
-                  </ComposedChart>
+                    <Area type="monotone" dataKey="confidence" stroke="#f87171" strokeWidth={3} fill="url(#confGradient)" />
+                    <Line type="monotone" dataKey="drift" stroke="#3b82f6" strokeWidth={2} dot={false} strokeDasharray="5 5" />
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
-                  <span className="text-[10px] font-bold text-slate-300">Human Trust Score (HTS)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-1 border-t-2 border-dashed border-amber-500"></div>
-                  <span className="text-[10px] font-bold text-slate-300">Avg. Response Latency (ms)</span>
-                </div>
+              <div className="mt-4 p-4 bg-red-900/10 border border-red-500/20 rounded-xl print:bg-slate-100">
+                 <p className="text-[10px] text-slate-300 print:text-slate-700">
+                   <span className="font-bold text-red-400 uppercase mr-2 print:text-red-600">Observation:</span>
+                   Confidence decline detected in Heritage Detection logic. Early-warning system engaged to prevent misclassification prior to public determination.
+                 </p>
               </div>
             </div>
 
-            <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Error Root Causes</h3>
+            {/* Legislative Traceability */}
+            <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6 print:border-slate-200">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Legislative Mapping</h3>
               <div className="space-y-6">
                 {featureImportance.map((f, i) => (
                   <div key={i} className="space-y-2">
                     <div className="flex justify-between text-[10px] font-bold">
-                      <span className="text-slate-300">{f.feature}</span>
-                      <span className={f.errorRate > 20 ? 'text-red-400' : 'text-slate-500'}>{f.errorRate}% Drift</span>
+                      <span className="text-slate-300 print:text-black">{f.feature}</span>
+                      <span className="text-blue-500 font-mono text-[9px]">{f.clause}</span>
                     </div>
-                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden flex">
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden flex print:bg-slate-200">
                       <div className="h-full bg-blue-500" style={{ width: `${f.importance}%` }}></div>
                       <div className="h-full bg-red-500/40" style={{ width: `${f.errorRate}%` }}></div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-8 p-3 bg-blue-500/5 rounded-lg border border-blue-500/10">
-                <p className="text-[10px] text-blue-400 leading-tight">
-                  <i className="fa-solid fa-lightbulb mr-2"></i>
-                  High drift in **Flood Zone** parsing. Recommend manual verification for SSD-2024-0892 location data.
-                </p>
-              </div>
+              <p className="mt-8 text-[9px] text-slate-500 italic leading-tight border-t border-slate-800 pt-4 print:text-slate-600">
+                Determinations are cryptographically linked to Statutory Instruments. Updates to LEP/SEPP laws trigger automated model re-validation requirements.
+              </p>
             </div>
           </div>
 
-          <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center justify-between">
-              Geospatial Fairness & Policy Mapping
-              <div className="flex gap-2">
-                <button className="px-2 py-1 bg-slate-800 rounded text-[8px] font-bold text-slate-400 hover:text-white transition-colors">NSW OVERVIEW</button>
-                <button className="px-2 py-1 bg-blue-600 rounded text-[8px] font-bold text-white">W. SYDNEY HUB</button>
-              </div>
-            </h3>
+          {/* Regional Fairness */}
+          <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6 print:border-slate-200">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Regional Equity Analysis</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="aspect-square bg-slate-800/40 rounded-xl relative overflow-hidden flex items-center justify-center border border-slate-700">
+              <div className="aspect-square bg-slate-800/40 rounded-xl relative overflow-hidden flex items-center justify-center border border-slate-700 print:bg-slate-50">
                 <svg viewBox="0 0 500 500" className="w-full h-full opacity-30">
-                  <path d="M50,50 Q250,20 450,50 T450,450 T50,450 Z" fill="none" stroke="#64748b" strokeWidth="1" strokeDasharray="10 5" />
-                  <circle cx="200" cy="200" r="120" fill="#22c55e" fillOpacity="0.1" stroke="#22c55e" strokeWidth="0.5" />
-                  <circle cx="320" cy="350" r="80" fill="#ef4444" fillOpacity="0.1" stroke="#ef4444" strokeWidth="0.5" />
+                  <path d="M50,50 Q250,20 450,50 T450,450 T50,450 Z" fill="none" stroke="#64748b" strokeWidth="1" />
+                  <circle cx="200" cy="200" r="120" fill="#22c55e" fillOpacity="0.1" />
+                  <circle cx="320" cy="350" r="80" fill="#ef4444" fillOpacity="0.1" />
                 </svg>
-                {/* Simulated Radar Ping */}
-                <div className="absolute top-1/2 left-1/2 w-32 h-32 border border-blue-500/20 rounded-full -translate-x-1/2 -translate-y-1/2 animate-[ping_3s_linear_infinite]"></div>
-                
-                <div className="absolute top-1/3 left-1/3 p-2 bg-slate-900/90 border border-red-500/30 rounded shadow-2xl animate-bounce">
-                  <div className="text-[8px] font-bold text-red-500 mb-1 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> BIAS ANOMALY
-                  </div>
-                  <div className="text-[10px] text-white">Flood Zone C (SSD)</div>
-                  <div className="text-[9px] text-slate-400 mt-1">Var: +12.4% vs Sydney Baseline</div>
+                <div className="absolute top-1/3 left-1/3 p-2 bg-slate-900/90 border border-red-500/30 rounded shadow-2xl print:bg-white print:border-red-500">
+                  <div className="text-[8px] font-bold text-red-500 mb-1 uppercase">Bias Alert</div>
+                  <div className="text-[10px] text-white print:text-black">Flood Zone C (SSD)</div>
+                  <div className="text-[9px] text-slate-400 mt-1">Var: +12.4% vs Baseline</div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
-                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Bias Mitigation Log</h4>
+                <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-700 print:bg-slate-100">
+                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Metric Variance</h4>
                   <div className="space-y-3">
                     {REGION_BIAS_DATA.map((r, i) => (
                       <div key={i} className="flex items-center justify-between">
-                        <span className="text-xs text-slate-300">{r.name}</span>
+                        <span className="text-xs text-slate-300 print:text-black">{r.name}</span>
                         <div className="flex items-center gap-3">
-                          <div className={`text-[10px] font-mono ${r.variance < -5 ? 'text-red-400' : 'text-slate-500'}`}>{r.variance}% VAR</div>
-                          <div className="w-24 h-1 bg-slate-800 rounded-full overflow-hidden">
+                          <div className={`text-[10px] font-mono ${r.variance < -5 ? 'text-red-400' : 'text-slate-500'}`}>{r.variance}%</div>
+                          <div className="w-24 h-1 bg-slate-800 rounded-full overflow-hidden print:bg-slate-300">
                             <div className={`h-full ${r.variance < -10 ? 'bg-red-500' : 'bg-blue-500'}`} style={{ width: `${r.approval}%` }}></div>
                           </div>
                         </div>
@@ -166,150 +175,123 @@ const PhaseAssurance: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
-                  <div className="flex items-center gap-3 mb-2">
-                    <i className="fa-solid fa-triangle-exclamation text-amber-500"></i>
-                    <h5 className="text-xs font-bold text-amber-500 uppercase tracking-tighter">System Alert: Imbalance</h5>
-                  </div>
-                  <p className="text-[10px] text-slate-300 leading-relaxed">
-                    AI model is penalizing applications in Flood Zone C based on historical 2018 datasets. Current 2024 flood mitigation infrastructure not yet indexed by Vendor SR00809.
+                <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl print:bg-blue-50">
+                  <p className="text-[10px] text-slate-300 leading-relaxed print:text-slate-700">
+                    <span className="font-bold text-blue-400 block mb-1 uppercase">Governance Strategy:</span>
+                    Active monitoring ensures Western Sydney SSD applications are not unfairly penalized by legacy data patterns found in the base vendor models.
                   </p>
-                  <button className="mt-3 w-full bg-amber-600 hover:bg-amber-700 text-white text-[9px] font-bold py-2 rounded transition-colors uppercase tracking-widest">
-                    Force Bias Correction Factor
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Panel 2: The Handover Watchdog */}
+        {/* Sidebar Column: Security & Audit */}
         <div className="col-span-12 lg:col-span-4 space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-             <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl"></div>
-             <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-               <i className="fa-solid fa-shield-halved"></i>
-               Technical Risk Register
+          {/* Adversarial Monitor */}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden print:border-slate-200">
+             <div className="absolute -top-12 -right-12 w-32 h-32 bg-red-600/10 rounded-full blur-3xl print:hidden"></div>
+             <h3 className="text-xs font-bold text-red-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+               <i className="fa-solid fa-shield-virus"></i>
+               Adversarial Surveillance
              </h3>
              <div className="space-y-4">
-               {ACTIVE_RISKS.map((risk, i) => (
-                 <div key={i} className="group p-4 bg-slate-800/20 border border-slate-700 hover:border-blue-500 rounded-xl transition-all cursor-pointer">
+               {MOCK_BLOCKED_ATTEMPTS.map((attempt, i) => (
+                 <div key={i} className="p-4 bg-red-900/5 border border-red-900/20 rounded-xl print:border-slate-200">
                    <div className="flex justify-between items-start mb-2">
-                     <span className="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">{risk.id} // ACTIVE</span>
-                     <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-widest ${
-                       risk.severity === 'high' ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'
-                     }`}>
-                       {risk.severity}
+                     <span className="text-[9px] font-mono text-red-400 uppercase">{attempt.id} // BLOCKED</span>
+                     <span className="text-[8px] font-bold px-1.5 py-0.5 bg-red-500 text-white rounded-sm uppercase tracking-widest">
+                       {attempt.status}
                      </span>
                    </div>
-                   <h4 className="text-xs font-bold text-slate-200 group-hover:text-blue-400 transition-colors">{risk.title}</h4>
-                   <div className="mt-3 flex items-center justify-between text-[10px]">
-                     <div className="flex items-center gap-1 text-slate-500">
-                       <i className="fa-solid fa-clock-rotate-left"></i>
-                       Detected 4h ago
-                     </div>
-                     <span className={`font-bold ${risk.trend === 'up' ? 'text-red-400' : 'text-green-400'}`}>
-                       {risk.trend === 'up' ? '↗ Increasing' : '↘ Stable'}
-                     </span>
-                   </div>
+                   <h4 className="text-xs font-bold text-slate-200 print:text-black">{attempt.type}</h4>
+                   <p className="text-[9px] text-slate-500 mt-1">Target Path: {attempt.target}</p>
                  </div>
                ))}
              </div>
-             <button className="mt-6 w-full border border-blue-500/50 text-blue-400 text-[10px] font-bold py-3 rounded-xl hover:bg-blue-500/10 transition-all uppercase tracking-widest">
-               Execute AIAF Deep-Audit
-             </button>
+             <div className="mt-6 p-3 bg-red-500/5 rounded-lg border border-red-500/10 print:bg-red-50">
+                <p className="text-[9px] text-red-300/80 leading-tight print:text-red-700">
+                  System actively neutralizes prompt-injection and "poisoned" document attempts. Security telemetry shared with Cyber NSW.
+                </p>
+             </div>
           </div>
 
-          <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Human Overrides</h3>
+          {/* Human-in-the-Loop */}
+          <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6 print:border-slate-200">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center justify-between">
+              Human Audit Index
+              <span className="text-blue-400 text-[10px] font-bold">4.2% OVERRIDE RATE</span>
+            </h3>
             <div className="space-y-4">
                {[
-                 { user: 'Sarah P.', action: 'Rejected AI GFA finding (conf: 65%)', time: '12:45', status: 'verified' },
-                 { user: 'James W.', action: 'Modified Acoustic Condition', time: '11:20', status: 'verified' },
-                 { user: 'Sarah P.', action: 'Overrode Height Warning (Cl 4.6)', time: '09:30', status: 'alert' }
+                 { user: 'Sarah P.', action: 'Rejected AI GFA finding (conf: 65%)', time: '12:45' },
+                 { user: 'James W.', action: 'Modified Acoustic Condition', time: '11:20' },
+                 { user: 'Sarah P.', action: 'Overrode Height Warning (Cl 4.6)', time: '09:30' }
                ].map((log, i) => (
-                 <div key={i} className="flex gap-4 items-start group">
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 ring-4 ring-blue-500/10"></div>
+                 <div key={i} className="flex gap-4 items-start group border-b border-slate-800 pb-3 last:border-0 print:border-slate-100">
+                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5"></div>
                    <div className="flex-1">
                      <div className="flex justify-between items-center mb-0.5">
-                       <span className="text-[10px] font-bold text-slate-200">{log.user}</span>
+                       <span className="text-[10px] font-bold text-slate-200 print:text-black">{log.user}</span>
                        <span className="text-[9px] font-mono text-slate-500">{log.time}</span>
                      </div>
-                     <p className="text-[11px] text-slate-400 group-hover:text-slate-300 transition-colors">{log.action}</p>
+                     <p className="text-[11px] text-slate-400 print:text-slate-600">{log.action}</p>
                    </div>
                  </div>
                ))}
             </div>
-            <div className="mt-8 pt-6 border-t border-slate-800">
-               <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-2">
-                 <span>HUMAN-IN-THE-LOOP (HITL) RATE</span>
-                 <span className="text-blue-400">4.2% (±0.4)</span>
-               </div>
-               <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-                 <div className="h-full bg-blue-500 animate-[loading_2s_infinite]" style={{ width: '4.2%' }}></div>
-               </div>
-               <p className="text-[9px] text-slate-600 mt-3 italic leading-tight">
-                 Planner engagement is high. AI reliance is stable but not absolute, indicating a healthy Glass Box implementation.
-               </p>
-            </div>
+            <p className="text-[9px] text-slate-600 mt-6 italic leading-tight border-t border-slate-800 pt-4 print:text-slate-400 print:border-slate-100">
+              High Planner engagement verified. Override trends indicate healthy professional judgment and system contestability as per AIAF requirement.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Decision Pipeline Archaeology */}
-      <div className="mt-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-8 relative">
-        <div className="absolute inset-0 bg-grid-slate-800/[0.05] bg-[bottom_left] [mask-image:linear-gradient(0deg,transparent,black)]"></div>
-        <div className="relative z-10">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-10 flex items-center gap-3">
-            <i className="fa-solid fa-code-branch text-blue-500"></i>
-            Traceability Genealogy // Decision #SSD-892-TRANS-01
-          </h3>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 px-4">
-            {GENEALOGY.map((step, i) => (
-              <React.Fragment key={i}>
-                <div className="flex flex-col items-center gap-4 group">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 group-hover:scale-110 ${
-                    step.status === 'complete' ? 'bg-blue-600/10 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]' :
-                    step.status === 'active' ? 'bg-amber-600/10 border-amber-500 text-amber-400 animate-pulse' :
-                    'bg-slate-900 border-slate-800 text-slate-700'
-                  }`}>
-                    <i className={`fa-solid text-sm ${
-                      step.label === 'Document Ingest' ? 'fa-file-import' :
-                      step.label === 'OCR Extraction' ? 'fa-magnifying-glass' :
-                      step.label === 'Rule Mapping' ? 'fa-code-merge' :
-                      'fa-file-signature'
-                    }`}></i>
-                  </div>
-                  <div className="text-center">
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${step.status === 'pending' ? 'text-slate-600' : 'text-slate-300'}`}>{step.label}</p>
-                    <p className="text-[9px] font-mono text-slate-500 mt-1">{step.timestamp}</p>
-                  </div>
+      {/* Decision Genealogy */}
+      <div className="mt-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-8 relative print:border-slate-200 print:bg-white">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-10 flex items-center gap-3">
+          <i className="fa-solid fa-dna text-blue-500"></i>
+          Traceability Genealogy // ID: SSD-892-TRANS-01
+        </h3>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 px-4">
+          {GENEALOGY.map((step, i) => (
+            <React.Fragment key={i}>
+              <div className="flex flex-col items-center gap-4 group">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all ${
+                  step.status === 'complete' ? 'bg-blue-600/10 border-blue-500 text-blue-400 print:bg-blue-50 print:text-blue-600' :
+                  step.status === 'active' ? 'bg-amber-600/10 border-amber-500 text-amber-400 animate-pulse' :
+                  'bg-slate-900 border-slate-800 text-slate-700'
+                }`}>
+                  <i className={`fa-solid text-sm ${
+                    step.label === 'Document Ingest' ? 'fa-file-import' :
+                    step.label === 'OCR Extraction' ? 'fa-magnifying-glass' :
+                    step.label === 'Rule Mapping' ? 'fa-code-merge' :
+                    'fa-file-signature'
+                  }`}></i>
                 </div>
-                {i < GENEALOGY.length - 1 && (
-                  <div className="hidden md:flex flex-1 items-center gap-1 opacity-20">
-                    <div className="h-0.5 flex-1 bg-gradient-to-r from-blue-500 to-slate-500"></div>
-                    <i className="fa-solid fa-chevron-right text-[8px]"></i>
-                  </div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+                <div className="text-center">
+                  <p className={`text-[10px] font-black uppercase tracking-widest ${step.status === 'pending' ? 'text-slate-600' : 'text-slate-300 print:text-black'}`}>{step.label}</p>
+                  <p className="text-[9px] font-mono text-slate-500 mt-1">{step.timestamp}</p>
+                </div>
+              </div>
+              {i < GENEALOGY.length - 1 && (
+                <div className="hidden md:flex flex-1 items-center gap-1 opacity-20 print:opacity-50">
+                  <div className="h-0.5 flex-1 bg-slate-500"></div>
+                  <i className="fa-solid fa-chevron-right text-[8px]"></i>
+                </div>
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
-      <footer className="mt-8 flex justify-between items-center text-[10px] text-slate-500">
+      <footer className="mt-8 flex justify-between items-center text-[10px] text-slate-500 border-t border-slate-800 pt-6 print:border-slate-200">
         <div className="flex gap-6">
-          <div className="flex items-center gap-2">
-             <i className="fa-solid fa-link"></i>
-             <span>SR00809-API-ENDPOINT: <span className="text-slate-400 font-mono">10.0.42.1</span></span>
-          </div>
-          <div className="flex items-center gap-2">
-             <i className="fa-solid fa-fingerprint"></i>
-             <span>ENCRYPTION: AES-256-GCM</span>
-          </div>
+          <span>VEO-ENGINE: <span className="text-slate-400 font-mono">10.0.42.1</span></span>
+          <span>AIAF-COMPLIANT: AES-256-GCM</span>
         </div>
-        <div className="font-mono text-[9px] text-blue-500/50 uppercase tracking-widest animate-pulse">
-          Monitoring Active: 0 alerts unresolved
+        <div className="font-mono text-[9px] text-blue-500/50 uppercase tracking-widest print:text-slate-400">
+          Independent Owner's Engineer Audit Verified
         </div>
       </footer>
     </div>

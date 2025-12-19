@@ -1,5 +1,5 @@
 
-import { DocumentStatus, ComplianceIssue, Precedent, AuditLog, AIAFMetric, VendorHealth, SystemRisk, GenealogyStep } from './types';
+import { DocumentStatus, ComplianceIssue, Precedent, AuditLog, AIAFMetric, VendorHealth, SystemRisk, GenealogyStep, BlockedAttempt } from './types';
 
 export const PROJECT_NAME = "Western Sydney Green Tech Hub";
 export const PROJECT_ID = "SSD-2024-0892";
@@ -128,6 +128,12 @@ export const ACTIVE_RISKS: SystemRisk[] = [
   { id: 'R-04', title: 'Model Drift in Heritage Detection', severity: 'high', trend: 'up' },
   { id: 'R-09', title: 'Regional Bias: Flood Zone C', severity: 'medium', trend: 'up' },
   { id: 'R-12', title: 'PII Leakage risk in CAD parsing', severity: 'low', trend: 'stable' }
+];
+
+export const MOCK_BLOCKED_ATTEMPTS: BlockedAttempt[] = [
+  { id: 'BLK-01', type: 'Prompt Injection', target: 'Policy Engine', timestamp: '14:22:05', status: 'Blocked' },
+  { id: 'BLK-02', type: 'Invisible Text', target: 'PDF Ingester', timestamp: '12:15:42', status: 'Quarantined' },
+  { id: 'BLK-03', type: 'Malicious Macro', target: 'EIS Doc Parser', timestamp: '09:30:11', status: 'Blocked' }
 ];
 
 export const GENEALOGY: GenealogyStep[] = [

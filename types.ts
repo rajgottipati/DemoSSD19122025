@@ -74,6 +74,14 @@ export interface SystemRisk {
   trend: 'up' | 'down' | 'stable';
 }
 
+export interface BlockedAttempt {
+  id: string;
+  type: 'Prompt Injection' | 'Invisible Text' | 'Malicious Macro';
+  target: string;
+  timestamp: string;
+  status: 'Blocked' | 'Quarantined';
+}
+
 export interface GenealogyStep {
   label: string;
   status: 'complete' | 'active' | 'pending';
