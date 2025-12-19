@@ -1,257 +1,317 @@
 
 import React from 'react';
 import { MOCK_AIAF_METRICS, MOCK_VENDOR_HEALTH, ACTIVE_RISKS, GENEALOGY, REGION_BIAS_DATA } from '../constants';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, ScatterChart, Scatter, ZAxis } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar, CartesianGrid } from 'recharts';
 
-const confidenceData = [
-  { time: '00:00', score: 98 }, { time: '04:00', score: 97 },
-  { time: '08:00', score: 92 }, { time: '12:00', score: 88 },
-  { time: '16:00', score: 84 }, { time: '20:00', score: 82 },
+const telemetryData = [
+  { time: '09:00', latency: 1.1, trust: 92, drift: 0.02 },
+  { time: '10:00', latency: 1.4, trust: 88, drift: 0.05 },
+  { time: '11:00', latency: 2.1, trust: 75, drift: 0.12 },
+  { time: '12:00', latency: 1.2, trust: 82, drift: 0.15 },
+  { time: '13:00', latency: 1.3, trust: 80, drift: 0.14 },
+  { time: '14:00', latency: 1.5, trust: 78, drift: 0.18 },
 ];
 
-const overrideData = [
-  { name: 'Override', value: 4.2 },
-  { name: 'Auto-Accept', value: 95.8 },
+const featureImportance = [
+  { feature: 'Height (m)', importance: 88, errorRate: 12 },
+  { feature: 'GFA (sqm)', importance: 94, errorRate: 25 },
+  { feature: 'Flood Zone', importance: 72, errorRate: 35 },
+  { feature: 'Heritage Buffer', importance: 65, errorRate: 8 },
 ];
 
 const PhaseAssurance: React.FC = () => {
   return (
-    <div className="min-h-full bg-[#0a0e14] text-slate-300 p-6 font-sans">
-      {/* Top Header */}
-      <header className="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">NSW AIAF Assurance Monitor</h2>
-          <p className="text-[10px] text-slate-500 font-mono uppercase tracking-widest">SR00809 SSD Solution Delivery</p>
+    <div className="min-h-full bg-[#030712] text-slate-400 p-8 font-sans selection:bg-blue-500/30">
+      {/* Global System Telemetry Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-1">
+              <div className="w-2 h-6 bg-blue-600 rounded-sm"></div>
+              <div className="w-2 h-6 bg-blue-400 rounded-sm"></div>
+            </div>
+            <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic">Control Center <span className="text-blue-500 font-light not-italic">AIAF Monitor</span></h1>
+          </div>
+          <p className="text-[10px] font-mono text-slate-500 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            OWNER'S ENGINEER INTERFACE v4.9-STABLE // SYSTEM: SR00809-PROD
+          </p>
         </div>
-        <div className="flex gap-4">
-          {[
-            { label: 'Privacy', color: 'bg-green-500' },
-            { label: 'Fairness', color: 'bg-amber-500' },
-            { label: 'Transparency', color: 'bg-green-500' },
-            { label: 'Security', color: 'bg-green-500' },
-          ].map((status, i) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded">
-              <div className={`w-2 h-2 rounded-full ${status.color} shadow-[0_0_8px_rgba(34,197,94,0.3)]`}></div>
-              <span className="text-[10px] font-bold uppercase text-slate-400">{status.label}</span>
+
+        <div className="flex flex-wrap gap-2">
+          {MOCK_AIAF_METRICS.map((metric, i) => (
+            <div key={i} className="bg-slate-900/40 border border-slate-800 px-4 py-2 rounded-lg flex flex-col min-w-[120px]">
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{metric.category}</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className={`text-lg font-mono font-bold ${metric.status === 'drift' ? 'text-amber-500' : 'text-white'}`}>{metric.score}%</span>
+                <i className={`fa-solid ${metric.status === 'drift' ? 'fa-arrow-trend-down text-amber-500' : 'fa-check text-green-500'} text-[10px]`}></i>
+              </div>
             </div>
           ))}
         </div>
-      </header>
+      </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-12 gap-4 mb-4">
+      <div className="grid grid-cols-12 gap-6">
         
-        {/* Left Panel: The Watchdog */}
-        <div className="col-span-3 space-y-4">
-          <section className="bg-slate-900/50 border border-slate-800 rounded-lg p-4 h-full flex flex-col">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between">
-              Real-Time Risk Register
-              <i className="fa-solid fa-eye text-blue-500"></i>
-            </h3>
-            
-            <div className="space-y-3 flex-1">
-              {ACTIVE_RISKS.map((risk) => (
-                <div key={risk.id} className="p-3 bg-slate-800/40 border-l-2 border-slate-700 hover:border-blue-500 transition-all rounded-r">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-[10px] font-mono text-slate-500">{risk.id}</span>
-                    <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                      risk.severity === 'high' ? 'bg-red-900/40 text-red-400' : 
-                      risk.severity === 'medium' ? 'bg-amber-900/40 text-amber-400' : 'bg-blue-900/40 text-blue-400'
-                    }`}>
-                      {risk.severity}
-                    </span>
-                  </div>
-                  <p className="text-xs font-medium text-slate-200">{risk.title}</p>
-                  <div className="flex items-center gap-1 mt-2">
-                    <i className={`fa-solid fa-chart-line text-[10px] ${risk.trend === 'up' ? 'text-red-400' : 'text-green-400'}`}></i>
-                    <span className="text-[8px] text-slate-500 uppercase">Trend: {risk.trend}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-slate-800">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-[10px] font-bold text-slate-500 uppercase">Model Confidence (24h)</span>
-                <span className="text-xs font-bold text-red-400">-16%</span>
+        {/* Panel 1: Real-Time Observability & Human Trust Index */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 bg-slate-900/20 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <i className="fa-solid fa-wave-square text-6xl text-blue-500"></i>
               </div>
-              <div className="h-16 w-full">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center justify-between">
+                System Telemetry: Latency vs. Human Trust
+                <span className="text-[9px] font-mono text-slate-600">SAMPLE RATE: 100ms</span>
+              </h3>
+              <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={confidenceData}>
-                    <Line type="monotone" dataKey="score" stroke="#f87171" strokeWidth={2} dot={false} />
-                    <Tooltip contentStyle={{backgroundColor: '#0f172a', border: 'none', fontSize: '10px'}} itemStyle={{color: '#f87171'}} />
-                  </LineChart>
+                  <ComposedChart data={telemetryData}>
+                    <defs>
+                      <linearGradient id="trustGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                    <XAxis dataKey="time" hide />
+                    <YAxis hide />
+                    <Tooltip 
+                      contentStyle={{backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px', fontSize: '10px'}}
+                      itemStyle={{padding: '2px 0'}}
+                    />
+                    <Area type="monotone" dataKey="trust" stroke="#3b82f6" strokeWidth={3} fill="url(#trustGradient)" />
+                    <Line type="monotone" dataKey="latency" stroke="#f59e0b" strokeWidth={2} dot={{fill: '#f59e0b', r: 3}} strokeDasharray="5 5" />
+                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
+              <div className="mt-4 flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
+                  <span className="text-[10px] font-bold text-slate-300">Human Trust Score (HTS)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-1 border-t-2 border-dashed border-amber-500"></div>
+                  <span className="text-[10px] font-bold text-slate-300">Avg. Response Latency (ms)</span>
+                </div>
+              </div>
             </div>
-          </section>
-        </div>
 
-        {/* Center Panel: The Fairness Map */}
-        <div className="col-span-6">
-          <section className="bg-slate-900/50 border border-slate-800 rounded-lg p-4 relative overflow-hidden h-full">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between">
-              Geospatial Bias Detection
-              <i className="fa-solid fa-map-location text-amber-500"></i>
-            </h3>
-
-            {/* Mock NSW Map Overlay */}
-            <div className="relative aspect-video bg-slate-900/80 rounded-lg flex items-center justify-center border border-slate-800 group cursor-crosshair">
-              <svg viewBox="0 0 500 300" className="w-full h-full opacity-40">
-                <path d="M100,50 L400,30 L450,250 L80,280 Z" fill="none" stroke="#334155" strokeWidth="1" />
-                {/* Heatmap Blobs */}
-                <circle cx="200" cy="150" r="40" fill="#22c55e" fillOpacity="0.3" />
-                <circle cx="280" cy="180" r="30" fill="#22c55e" fillOpacity="0.2" />
-                <circle cx="150" cy="210" r="25" fill="#f59e0b" fillOpacity="0.4" />
-                <circle cx="350" cy="120" r="20" fill="#ef4444" fillOpacity="0.5" />
-              </svg>
-              
-              {/* Region Data Nodes */}
-              {REGION_BIAS_DATA.map((r, i) => (
-                <div key={i} className="absolute flex items-center gap-1 group/node" style={{
-                  top: `${20 + (i * 15)}%`,
-                  left: `${15 + (i * 12)}%`
-                }}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${r.variance < 0 ? (r.variance < -10 ? 'bg-red-500' : 'bg-amber-500') : 'bg-green-500'} animate-pulse`}></div>
-                  <div className="hidden group-hover/node:block bg-slate-900 border border-slate-700 p-2 rounded text-[9px] shadow-2xl z-50">
-                    <div className="font-bold text-white mb-1">{r.name}</div>
-                    <div className="flex justify-between gap-4">
-                      <span>Approval Rate:</span>
-                      <span className="font-mono">{r.approval}%</span>
+            <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Error Root Causes</h3>
+              <div className="space-y-6">
+                {featureImportance.map((f, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex justify-between text-[10px] font-bold">
+                      <span className="text-slate-300">{f.feature}</span>
+                      <span className={f.errorRate > 20 ? 'text-red-400' : 'text-slate-500'}>{f.errorRate}% Drift</span>
                     </div>
-                    <div className="flex justify-between gap-4">
-                      <span>Variance:</span>
-                      <span className={`font-mono ${r.variance < 0 ? 'text-red-400' : 'text-green-400'}`}>{r.variance}%</span>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden flex">
+                      <div className="h-full bg-blue-500" style={{ width: `${f.importance}%` }}></div>
+                      <div className="h-full bg-red-500/40" style={{ width: `${f.errorRate}%` }}></div>
                     </div>
                   </div>
-                </div>
-              ))}
-
-              <div className="absolute inset-0 border border-blue-500/20 pointer-events-none group-hover:bg-blue-500/5 transition-colors"></div>
-            </div>
-
-            <div className="mt-4 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
-              <i className="fa-solid fa-circle-exclamation text-red-400 mt-1"></i>
-              <div>
-                <h4 className="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Anomaly Detected</h4>
-                <p className="text-xs text-slate-200">
-                  High Rejection Rate identified in **Flood Zone C** (Variance: <span className="text-red-400 font-bold">+12%</span> vs regional baseline).
+                ))}
+              </div>
+              <div className="mt-8 p-3 bg-blue-500/5 rounded-lg border border-blue-500/10">
+                <p className="text-[10px] text-blue-400 leading-tight">
+                  <i className="fa-solid fa-lightbulb mr-2"></i>
+                  High drift in **Flood Zone** parsing. Recommend manual verification for SSD-2024-0892 location data.
                 </p>
-                <button className="mt-2 text-[10px] font-bold text-blue-400 hover:underline uppercase tracking-tighter">Initiate Bias Audit</button>
               </div>
             </div>
-          </section>
-        </div>
+          </div>
 
-        {/* Right Panel: The Human Audit */}
-        <div className="col-span-3 space-y-4">
-          <section className="bg-slate-900/50 border border-slate-800 rounded-lg p-4 h-full">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between">
-              Human-in-the-Loop Metrics
-              <i className="fa-solid fa-user-check text-green-500"></i>
+          <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center justify-between">
+              Geospatial Fairness & Policy Mapping
+              <div className="flex gap-2">
+                <button className="px-2 py-1 bg-slate-800 rounded text-[8px] font-bold text-slate-400 hover:text-white transition-colors">NSW OVERVIEW</button>
+                <button className="px-2 py-1 bg-blue-600 rounded text-[8px] font-bold text-white">W. SYDNEY HUB</button>
+              </div>
             </h3>
-
-            <div className="flex flex-col items-center mb-6">
-              <div className="h-40 w-full relative">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={overrideData}
-                      cx="50%"
-                      cy="100%"
-                      startAngle={180}
-                      endAngle={0}
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={0}
-                      dataKey="value"
-                    >
-                      <Cell fill="#3b82f6" />
-                      <Cell fill="#1e293b" />
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute bottom-0 left-0 w-full text-center">
-                  <div className="text-2xl font-bold text-white">4.2%</div>
-                  <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Planner Override Rate</div>
-                  <div className="text-[9px] text-red-400 font-bold mt-1 uppercase">
-                    <i className="fa-solid fa-arrow-trend-up mr-1"></i> Trending Up
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="aspect-square bg-slate-800/40 rounded-xl relative overflow-hidden flex items-center justify-center border border-slate-700">
+                <svg viewBox="0 0 500 500" className="w-full h-full opacity-30">
+                  <path d="M50,50 Q250,20 450,50 T450,450 T50,450 Z" fill="none" stroke="#64748b" strokeWidth="1" strokeDasharray="10 5" />
+                  <circle cx="200" cy="200" r="120" fill="#22c55e" fillOpacity="0.1" stroke="#22c55e" strokeWidth="0.5" />
+                  <circle cx="320" cy="350" r="80" fill="#ef4444" fillOpacity="0.1" stroke="#ef4444" strokeWidth="0.5" />
+                </svg>
+                {/* Simulated Radar Ping */}
+                <div className="absolute top-1/2 left-1/2 w-32 h-32 border border-blue-500/20 rounded-full -translate-x-1/2 -translate-y-1/2 animate-[ping_3s_linear_infinite]"></div>
+                
+                <div className="absolute top-1/3 left-1/3 p-2 bg-slate-900/90 border border-red-500/30 rounded shadow-2xl animate-bounce">
+                  <div className="text-[8px] font-bold text-red-500 mb-1 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> BIAS ANOMALY
                   </div>
+                  <div className="text-[10px] text-white">Flood Zone C (SSD)</div>
+                  <div className="text-[9px] text-slate-400 mt-1">Var: +12.4% vs Sydney Baseline</div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+                  <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Bias Mitigation Log</h4>
+                  <div className="space-y-3">
+                    {REGION_BIAS_DATA.map((r, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <span className="text-xs text-slate-300">{r.name}</span>
+                        <div className="flex items-center gap-3">
+                          <div className={`text-[10px] font-mono ${r.variance < -5 ? 'text-red-400' : 'text-slate-500'}`}>{r.variance}% VAR</div>
+                          <div className="w-24 h-1 bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${r.variance < -10 ? 'bg-red-500' : 'bg-blue-500'}`} style={{ width: `${r.approval}%` }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <i className="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                    <h5 className="text-xs font-bold text-amber-500 uppercase tracking-tighter">System Alert: Imbalance</h5>
+                  </div>
+                  <p className="text-[10px] text-slate-300 leading-relaxed">
+                    AI model is penalizing applications in Flood Zone C based on historical 2018 datasets. Current 2024 flood mitigation infrastructure not yet indexed by Vendor SR00809.
+                  </p>
+                  <button className="mt-3 w-full bg-amber-600 hover:bg-amber-700 text-white text-[9px] font-bold py-2 rounded transition-colors uppercase tracking-widest">
+                    Force Bias Correction Factor
+                  </button>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="space-y-3">
-              <h4 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-2">Recent Overrides</h4>
-              {[
-                { user: 'Sarah P.', action: 'Rejected Heritage finding', time: '10m ago' },
-                { user: 'James W.', action: 'Modified GFA Extraction', time: '1h ago' },
-                { user: 'Sarah P.', action: 'Overrode Height Breach alert', time: '3h ago' },
-              ].map((over, i) => (
-                <div key={i} className="flex items-center justify-between p-2 bg-slate-800/30 rounded border border-transparent hover:border-slate-700 transition-colors cursor-pointer">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-200">{over.user}</span>
-                    <span className="text-[9px] text-slate-500">{over.action}</span>
+        {/* Panel 2: The Handover Watchdog */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+             <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl"></div>
+             <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+               <i className="fa-solid fa-shield-halved"></i>
+               Technical Risk Register
+             </h3>
+             <div className="space-y-4">
+               {ACTIVE_RISKS.map((risk, i) => (
+                 <div key={i} className="group p-4 bg-slate-800/20 border border-slate-700 hover:border-blue-500 rounded-xl transition-all cursor-pointer">
+                   <div className="flex justify-between items-start mb-2">
+                     <span className="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">{risk.id} // ACTIVE</span>
+                     <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-widest ${
+                       risk.severity === 'high' ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'
+                     }`}>
+                       {risk.severity}
+                     </span>
+                   </div>
+                   <h4 className="text-xs font-bold text-slate-200 group-hover:text-blue-400 transition-colors">{risk.title}</h4>
+                   <div className="mt-3 flex items-center justify-between text-[10px]">
+                     <div className="flex items-center gap-1 text-slate-500">
+                       <i className="fa-solid fa-clock-rotate-left"></i>
+                       Detected 4h ago
+                     </div>
+                     <span className={`font-bold ${risk.trend === 'up' ? 'text-red-400' : 'text-green-400'}`}>
+                       {risk.trend === 'up' ? '↗ Increasing' : '↘ Stable'}
+                     </span>
+                   </div>
+                 </div>
+               ))}
+             </div>
+             <button className="mt-6 w-full border border-blue-500/50 text-blue-400 text-[10px] font-bold py-3 rounded-xl hover:bg-blue-500/10 transition-all uppercase tracking-widest">
+               Execute AIAF Deep-Audit
+             </button>
+          </div>
+
+          <div className="bg-slate-900/20 border border-slate-800 rounded-2xl p-6">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Human Overrides</h3>
+            <div className="space-y-4">
+               {[
+                 { user: 'Sarah P.', action: 'Rejected AI GFA finding (conf: 65%)', time: '12:45', status: 'verified' },
+                 { user: 'James W.', action: 'Modified Acoustic Condition', time: '11:20', status: 'verified' },
+                 { user: 'Sarah P.', action: 'Overrode Height Warning (Cl 4.6)', time: '09:30', status: 'alert' }
+               ].map((log, i) => (
+                 <div key={i} className="flex gap-4 items-start group">
+                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 ring-4 ring-blue-500/10"></div>
+                   <div className="flex-1">
+                     <div className="flex justify-between items-center mb-0.5">
+                       <span className="text-[10px] font-bold text-slate-200">{log.user}</span>
+                       <span className="text-[9px] font-mono text-slate-500">{log.time}</span>
+                     </div>
+                     <p className="text-[11px] text-slate-400 group-hover:text-slate-300 transition-colors">{log.action}</p>
+                   </div>
+                 </div>
+               ))}
+            </div>
+            <div className="mt-8 pt-6 border-t border-slate-800">
+               <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-2">
+                 <span>HUMAN-IN-THE-LOOP (HITL) RATE</span>
+                 <span className="text-blue-400">4.2% (±0.4)</span>
+               </div>
+               <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                 <div className="h-full bg-blue-500 animate-[loading_2s_infinite]" style={{ width: '4.2%' }}></div>
+               </div>
+               <p className="text-[9px] text-slate-600 mt-3 italic leading-tight">
+                 Planner engagement is high. AI reliance is stable but not absolute, indicating a healthy Glass Box implementation.
+               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Decision Pipeline Archaeology */}
+      <div className="mt-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-8 relative">
+        <div className="absolute inset-0 bg-grid-slate-800/[0.05] bg-[bottom_left] [mask-image:linear-gradient(0deg,transparent,black)]"></div>
+        <div className="relative z-10">
+          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-10 flex items-center gap-3">
+            <i className="fa-solid fa-code-branch text-blue-500"></i>
+            Traceability Genealogy // Decision #SSD-892-TRANS-01
+          </h3>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 px-4">
+            {GENEALOGY.map((step, i) => (
+              <React.Fragment key={i}>
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 group-hover:scale-110 ${
+                    step.status === 'complete' ? 'bg-blue-600/10 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]' :
+                    step.status === 'active' ? 'bg-amber-600/10 border-amber-500 text-amber-400 animate-pulse' :
+                    'bg-slate-900 border-slate-800 text-slate-700'
+                  }`}>
+                    <i className={`fa-solid text-sm ${
+                      step.label === 'Document Ingest' ? 'fa-file-import' :
+                      step.label === 'OCR Extraction' ? 'fa-magnifying-glass' :
+                      step.label === 'Rule Mapping' ? 'fa-code-merge' :
+                      'fa-file-signature'
+                    }`}></i>
                   </div>
-                  <span className="text-[8px] font-mono text-slate-600">{over.time}</span>
+                  <div className="text-center">
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${step.status === 'pending' ? 'text-slate-600' : 'text-slate-300'}`}>{step.label}</p>
+                    <p className="text-[9px] font-mono text-slate-500 mt-1">{step.timestamp}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        </div>
-      </div>
-
-      {/* Bottom Strip: Traceability Genealogy */}
-      <section className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-          <i className="fa-solid fa-dna text-blue-500"></i>
-          Active Decision Genealogy: SSD-2024-0892
-        </h3>
-        
-        <div className="flex items-center justify-between relative px-10">
-          {/* Progress Line */}
-          <div className="absolute top-1/2 left-0 w-full h-px bg-slate-800 -translate-y-1/2 z-0"></div>
-          
-          {GENEALOGY.map((step, i) => (
-            <div key={i} className="relative z-10 flex flex-col items-center">
-              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-1000 ${
-                step.status === 'complete' ? 'bg-blue-900/40 border-blue-500 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]' :
-                step.status === 'active' ? 'bg-amber-900/40 border-amber-500 text-amber-400 animate-pulse' :
-                'bg-slate-900 border-slate-700 text-slate-700'
-              }`}>
-                <i className={`fa-solid text-xs ${
-                  step.status === 'complete' ? 'fa-check' :
-                  step.status === 'active' ? 'fa-spinner fa-spin' :
-                  'fa-clock'
-                }`}></i>
-              </div>
-              <div className="mt-3 text-center">
-                <div className={`text-[10px] font-bold uppercase tracking-widest ${
-                  step.status === 'pending' ? 'text-slate-600' : 'text-slate-300'
-                }`}>{step.label}</div>
-                <div className="text-[8px] font-mono text-slate-500 mt-1">{step.timestamp}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Narrative Legend */}
-      <div className="mt-6 flex justify-between items-end">
-        <div className="text-[10px] text-slate-600 italic max-w-xl leading-relaxed">
-          "Buying AI is easy. Governing AI is the challenge. This dashboard provides the technical 'Drill-Down' necessary for NSW public service accountability. We bridge the gap between Vendor code and Policy intent."
-        </div>
-        <div className="flex gap-4">
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">System Version</span>
-            <span className="text-xs font-mono text-blue-400">AIAF-LOGIC-v4.2.1-PROD</span>
-          </div>
-          <div className="flex flex-col items-end border-l border-slate-800 pl-4">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Technical Contact</span>
-            <span className="text-xs font-medium text-slate-300">Owner's Engineer Hub</span>
+                {i < GENEALOGY.length - 1 && (
+                  <div className="hidden md:flex flex-1 items-center gap-1 opacity-20">
+                    <div className="h-0.5 flex-1 bg-gradient-to-r from-blue-500 to-slate-500"></div>
+                    <i className="fa-solid fa-chevron-right text-[8px]"></i>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </div>
+
+      <footer className="mt-8 flex justify-between items-center text-[10px] text-slate-500">
+        <div className="flex gap-6">
+          <div className="flex items-center gap-2">
+             <i className="fa-solid fa-link"></i>
+             <span>SR00809-API-ENDPOINT: <span className="text-slate-400 font-mono">10.0.42.1</span></span>
+          </div>
+          <div className="flex items-center gap-2">
+             <i className="fa-solid fa-fingerprint"></i>
+             <span>ENCRYPTION: AES-256-GCM</span>
+          </div>
+        </div>
+        <div className="font-mono text-[9px] text-blue-500/50 uppercase tracking-widest animate-pulse">
+          Monitoring Active: 0 alerts unresolved
+        </div>
+      </footer>
     </div>
   );
 };

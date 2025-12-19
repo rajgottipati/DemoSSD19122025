@@ -13,7 +13,8 @@ import DepartmentBulletin from './components/DepartmentBulletin';
 import GlassBoxPanel from './components/GlassBoxPanel';
 
 const App: React.FC = () => {
-  const [activePhase, setActivePhase] = useState<Phase>(Phase.TRIAGE);
+  // We initialize with ASSURANCE to showcase the "Owner's Engineer" advantage immediately.
+  const [activePhase, setActivePhase] = useState<Phase>(Phase.ASSURANCE);
   const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
 
   const renderPhase = () => {
@@ -33,18 +34,18 @@ const App: React.FC = () => {
       case Phase.BULLETIN:
         return <DepartmentBulletin />;
       default:
-        return <Phase1Triage onSelectIssue={setSelectedIssue} />;
+        return <PhaseAssurance />;
     }
   };
 
   const isAssurance = activePhase === Phase.ASSURANCE;
 
   return (
-    <div className={`flex h-screen overflow-hidden ${isAssurance ? 'bg-[#0a0e14]' : 'bg-slate-50'}`}>
+    <div className={`flex h-screen overflow-hidden ${isAssurance ? 'bg-[#030712]' : 'bg-slate-50'}`}>
       <Sidebar activePhase={activePhase} setActivePhase={setActivePhase} />
       
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header - Hidden in Assurance mode to maximize dashboard space */}
+        {/* Header - Hidden in Assurance mode to maximize dashboard space and maintain focus on NOC style */}
         {!isAssurance && (
           <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
             <div className="flex items-center gap-4">
@@ -57,7 +58,7 @@ const App: React.FC = () => {
               <button 
                 onClick={() => setActivePhase(Phase.ASSURANCE)}
                 className={`relative p-2 transition-colors ${activePhase === Phase.ASSURANCE ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
-                title="System Governance"
+                title="System Governance & Assurance"
               >
                 <i className="fa-solid fa-shield-halved text-xl"></i>
                 <span className="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full border-2 border-white"></span>
@@ -73,7 +74,7 @@ const App: React.FC = () => {
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-sm font-medium text-slate-700">{USER_NAME}</p>
-                  <p className="text-xs text-slate-400">Owner's Engineer | System Assurance</p>
+                  <p className="text-xs text-slate-400">Owner's Engineer | Governance</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
                   SP
