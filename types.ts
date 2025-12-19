@@ -5,7 +5,8 @@ export enum Phase {
   SPATIAL = 'spatial',
   PRECEDENT = 'precedent',
   AUDIT = 'audit',
-  BULLETIN = 'bulletin'
+  BULLETIN = 'bulletin',
+  ASSURANCE = 'assurance'
 }
 
 export interface DocumentStatus {
@@ -16,7 +17,7 @@ export interface DocumentStatus {
   confidence: number;
   issue?: string;
   sourcePage?: number;
-  logicPath?: string[]; // New for transparency: steps AI took to validate
+  logicPath?: string[];
 }
 
 export interface ComplianceIssue {
@@ -49,4 +50,19 @@ export interface AuditLog {
   aiSuggestion: string;
   outcome: 'accepted' | 'overridden' | 'modified';
   reason?: string;
+}
+
+export interface AIAFMetric {
+  category: string;
+  score: number;
+  status: 'stable' | 'drift' | 'alert';
+  description: string;
+}
+
+export interface VendorHealth {
+  modelName: string;
+  latency: string;
+  lastTrained: string;
+  driftIndex: number;
+  complianceScore: number;
 }

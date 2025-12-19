@@ -8,6 +8,7 @@ import Phase2Compliance from './components/Phase2Compliance';
 import Phase3Spatial from './components/Phase3Spatial';
 import Phase4Precedent from './components/Phase4Precedent';
 import Phase5Audit from './components/Phase5Audit';
+import PhaseAssurance from './components/PhaseAssurance';
 import DepartmentBulletin from './components/DepartmentBulletin';
 import GlassBoxPanel from './components/GlassBoxPanel';
 
@@ -27,6 +28,8 @@ const App: React.FC = () => {
         return <Phase4Precedent onSelectIssue={setSelectedIssue} />;
       case Phase.AUDIT:
         return <Phase5Audit />;
+      case Phase.ASSURANCE:
+        return <PhaseAssurance />;
       case Phase.BULLETIN:
         return <DepartmentBulletin />;
       default:
@@ -49,20 +52,27 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <button 
+              onClick={() => setActivePhase(Phase.ASSURANCE)}
+              className={`relative p-2 transition-colors ${activePhase === Phase.ASSURANCE ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
+              title="System Governance"
+            >
+              <i className="fa-solid fa-shield-halved text-xl"></i>
+              <span className="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full border-2 border-white"></span>
+            </button>
+            <button 
               onClick={() => setActivePhase(Phase.BULLETIN)}
-              className="relative p-2 text-slate-400 hover:text-blue-600 transition-colors"
-              title="Department Bulletin"
+              className={`relative p-2 transition-colors ${activePhase === Phase.BULLETIN ? 'text-blue-600' : 'text-slate-400 hover:text-blue-600'}`}
+              title="Innovation Hub"
             >
               <i className="fa-solid fa-bell text-xl"></i>
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
             <div className="h-8 w-px bg-slate-200 mx-2"></div>
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <p className="text-sm font-medium text-slate-700">{USER_NAME}</p>
-                <p className="text-xs text-slate-400">Senior Planner | NSW Dept. Planning</p>
+                <p className="text-xs text-slate-400">Owner's Engineer | System Assurance</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
                 SP
               </div>
             </div>
@@ -72,7 +82,9 @@ const App: React.FC = () => {
         {/* Content Area */}
         <div className="flex-1 flex overflow-hidden">
           <div className={`flex-1 overflow-y-auto p-8 transition-all duration-300 ${selectedIssue ? 'w-1/2' : 'w-full'}`}>
-            {renderPhase()}
+            <div className="max-w-6xl mx-auto">
+              {renderPhase()}
+            </div>
           </div>
           
           {selectedIssue && (

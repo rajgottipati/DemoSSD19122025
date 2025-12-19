@@ -7,18 +7,10 @@ const DepartmentBulletin: React.FC = () => {
   const [isDrafting, setIsDrafting] = useState(false);
   const [draftedEOI, setDraftedEOI] = useState('');
 
-  const eoiText = `Expressions of Interest - Use of Artificial Intelligence in State Significant Development
-Seeking two experienced planners for a full-time, 6-month secondment.
-What you’ll be doing:
-- Identifying and shaping use cases for AI in SSD planning.
-- Working closely with the Departments chosen vendor on solution validation.
-- Acting as a champion for new technology within Planning teams.
-Upload your CV and a one-page statement by 14 January 2026.`;
-
   const handleDraftEOI = async () => {
     setIsDrafting(true);
     const auditHighlights = MOCK_AUDIT_LOGS.map(l => `${l.action}: ${l.outcome}`).join(', ');
-    const userProfile = `${USER_NAME}, Senior Planner, Deep experience with SSD-2024-0892 and "Glass Box" methodology.`;
+    const userProfile = `${USER_NAME}, System Assurance Specialist, Expert in AIAF Technical Governance for SR00809.`;
     
     const statement = await geminiService.draftSecondmentStatement(userProfile, auditHighlights);
     setDraftedEOI(statement || '');
@@ -27,12 +19,36 @@ Upload your CV and a one-page statement by 14 January 2026.`;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
+      <div className="bg-amber-900 text-white p-8 rounded-2xl shadow-2xl relative overflow-hidden border border-amber-800">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+            <i className="fa-solid fa-triangle-exclamation text-amber-400 text-xl"></i>
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-200">Critical Handover Memo</span>
+          </div>
+          <h3 className="text-2xl font-bold mb-4">Managing Vendor Risk for SR00809</h3>
+          <p className="text-amber-100/80 text-sm leading-relaxed mb-6">
+            While the Department's AI Vendor builds the engine, we lack an independent **Owner's Engineer** to technically validate their claims. I have built the System Assurance model (viewable in the new dashboard) to protect the Department from legal and ethical risks by providing real-time technical auditability.
+          </p>
+          <div className="flex gap-4">
+            <div className="bg-white/10 px-4 py-2 rounded-lg backdrop-blur">
+              <div className="text-[10px] uppercase font-bold text-amber-300">Governance Strategy</div>
+              <div className="text-xs font-medium">Independent AIAF Verification</div>
+            </div>
+            <div className="bg-white/10 px-4 py-2 rounded-lg backdrop-blur">
+              <div className="text-[10px] uppercase font-bold text-amber-300">Handover Asset</div>
+              <div className="text-xs font-medium">Real-time Drift Dashboard</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Innovation Hub & Bulletin</h2>
+          <h2 className="text-xl font-bold text-slate-800">Innovation Hub & Bulletin</h2>
           <p className="text-slate-500">Departmental communications and innovation opportunities.</p>
         </div>
-        <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-xs font-bold border border-blue-200 animate-pulse">
+        <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-[10px] font-bold border border-blue-200 uppercase tracking-tight">
           1 New Opportunity
         </div>
       </div>
@@ -127,27 +143,6 @@ Upload your CV and a one-page statement by 14 January 2026.`;
           </div>
         </div>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 group hover:border-blue-300 transition-all cursor-pointer">
-          <div className="flex items-center gap-3 mb-4">
-            <i className="fa-solid fa-graduation-cap text-amber-500"></i>
-            <h4 className="font-bold text-slate-800">Training: Explainable AI</h4>
-          </div>
-          <p className="text-xs text-slate-500 mb-4">Master the "Glass Box" methodology for legal reporting. Available on MyLearning.</p>
-          <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-            <div className="h-full bg-amber-400" style={{ width: '65%' }}></div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-slate-200 group hover:border-blue-300 transition-all cursor-pointer">
-          <div className="flex items-center gap-3 mb-4">
-            <i className="fa-solid fa-flask text-purple-500"></i>
-            <h4 className="font-bold text-slate-800">Beta Testing: VEO Video RAG</h4>
-          </div>
-          <p className="text-xs text-slate-500 mb-4">Review site drone footage with AI object detection. Join the cohort.</p>
-          <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded">Beta Testing Open</span>
-        </div>
-      </div>
     </div>
   );
 };

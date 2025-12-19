@@ -1,5 +1,5 @@
 
-import { DocumentStatus, ComplianceIssue, Precedent, AuditLog } from './types';
+import { DocumentStatus, ComplianceIssue, Precedent, AuditLog, AIAFMetric, VendorHealth } from './types';
 
 export const PROJECT_NAME = "Western Sydney Green Tech Hub";
 export const PROJECT_ID = "SSD-2024-0892";
@@ -107,3 +107,19 @@ export const MOCK_AUDIT_LOGS: AuditLog[] = [
     outcome: 'accepted'
   }
 ];
+
+export const MOCK_AIAF_METRICS: AIAFMetric[] = [
+  { category: 'Transparency', score: 98, status: 'stable', description: 'Source attribution and citation accuracy.' },
+  { category: 'Accountability', score: 100, status: 'stable', description: 'Human override logging and trail verification.' },
+  { category: 'Fairness/Bias', score: 92, status: 'stable', description: 'Model impartialness across geographic regions.' },
+  { category: 'Privacy', score: 99, status: 'stable', description: 'PII scrubbing performance in EIS ingestion.' },
+  { category: 'Policy Accuracy', score: 88, status: 'drift', description: 'Alignment with 2024 SEPP amendments.' }
+];
+
+export const MOCK_VENDOR_HEALTH: VendorHealth = {
+  modelName: 'Buy.NSW SR00809 (Production)',
+  latency: '1.2s',
+  lastTrained: '2024-11-01',
+  driftIndex: 0.12,
+  complianceScore: 94.5
+};

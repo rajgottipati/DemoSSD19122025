@@ -14,6 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePhase, setActivePhase }) => {
     { id: Phase.SPATIAL, label: 'Spatial Verification', icon: 'fa-map-location-dot' },
     { id: Phase.PRECEDENT, label: 'Precedents & RAG', icon: 'fa-magnifying-glass-chart' },
     { id: Phase.AUDIT, label: 'Transparency Log', icon: 'fa-clipboard-check' },
+    { id: Phase.ASSURANCE, label: 'System Assurance', icon: 'fa-shield-halved' },
     { id: Phase.BULLETIN, label: 'Innovation Hub', icon: 'fa-bullhorn' },
   ];
 
@@ -24,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePhase, setActivePhase }) => {
           <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
             <i className="fa-solid fa-cube text-white"></i>
           </div>
-          <span className="font-bold text-lg tracking-tight">GLASS BOX</span>
+          <span className="font-bold text-lg tracking-tight uppercase tracking-widest">Glass Box</span>
         </div>
 
         <nav className="space-y-2">
@@ -32,13 +33,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activePhase, setActivePhase }) => {
             <button
               key={item.id}
               onClick={() => setActivePhase(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm font-medium ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${
                 activePhase === item.id 
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
                 : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
-              <i className={`fa-solid ${item.icon} w-5`}></i>
+              <i className={`fa-solid ${item.icon} w-5 text-center`}></i>
               {item.label}
             </button>
           ))}
@@ -47,10 +48,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activePhase, setActivePhase }) => {
 
       <div className="mt-auto p-6">
         <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-          <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2">AI Status</p>
+          <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mb-2">AIAF Handover Status</p>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-            <span className="text-xs text-slate-200">System Live (Gemini 3)</span>
+            <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+            <span className="text-[10px] text-slate-200">Owner's Engineer Audit Live</span>
           </div>
         </div>
       </div>
